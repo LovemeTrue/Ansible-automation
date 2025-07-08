@@ -1,12 +1,17 @@
-apiVersion: deckhouse.io/v1
-kind: GrafanaDatasource
+apiVersion: v1
+kind: Service
 metadata:
   name: pyroscope
-  namespace: d8-monitoring  # ВАЖНО: не меняй на pyroscope
+  namespace: d8-monitoring
+  labels:
+    app.kubernetes.io/name: pyroscope
 spec:
-  type: pyroscope
-  name: Pyroscope
-  access: proxy
-  url: http://pyroscope.pyroscope.svc.cluster.local:4040
-  isDefault: false
-  editable: true
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 4040
+      targetPort: 4040
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: pyroscope  # Должен совпадать с label у Pyroscope pod'ов
+    app.kubernetes.io/instance: pyroscope  # (если есть)
