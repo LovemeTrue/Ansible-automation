@@ -39,6 +39,8 @@
           -n {{ secret_namespace }}
 
         rm -f /tmp/access_key /tmp/secret_key
+        
+        kubectl create ns pyroscope || true
       args:
         executable: /bin/bash
 
