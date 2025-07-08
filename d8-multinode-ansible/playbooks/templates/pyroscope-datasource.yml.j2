@@ -1,0 +1,12 @@
+apiVersion: deckhouse.io/v1
+kind: GrafanaDatasource
+metadata:
+  name: pyroscope
+  namespace: d8-monitoring  # ВАЖНО: не меняй на pyroscope
+spec:
+  type: pyroscope
+  name: Pyroscope
+  access: proxy
+  url: http://pyroscope.pyroscope.svc.cluster.local:4040
+  isDefault: false
+  editable: true

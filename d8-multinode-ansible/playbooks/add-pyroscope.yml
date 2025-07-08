@@ -49,6 +49,21 @@
         src: templates/pyroscope-values.yml.j2
         dest: "/tmp/pyroscope-values.yml"
 
+    - name: Создать pyroscope-datasource.yaml
+      ansible.builtin.template:
+        src: templates/pyroscope-datasource.yaml.j2
+        dest: "/tmp/pyroscope-datasource.yaml"
+
+    - name: Применить GrafanaDatasource ресурс
+      ansible.builtin.shell: |
+        kubectl apply -f /tmp/pyroscope-datasource.yaml
+      args:
+        executable: /bin/bash
+      register: apply_result
+      changed_when:
+        - "'already exists' not in apply_result.stderr and 'created' in apply_result.stdout"
+        - "'unchanged' not in apply_result.stdout"
+    
     - name: Копировать файл values на локальную машину
       ansible.builtin.copy:
         src: "/tmp/pyroscope-values.yml"
