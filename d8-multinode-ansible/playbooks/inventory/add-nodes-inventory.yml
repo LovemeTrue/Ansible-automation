@@ -1,0 +1,29 @@
+all:
+  vars:
+    kube_apiserver: "91.217.196.189:6443"   # Замените на ваш адрес API-сервера
+    token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Im1NdG4tZWdLbVpVRHl0Yjl3NFl3Q1FheVhkdjJRbDN0d0hCcXN3T3daVlUifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiXSwiZXhwIjoxNzUxOTU1OTUzLCJpYXQiOjE3NTE5NTIzNTMsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwianRpIjoiYmQzMDhhOGItYjgzOS00NWE5LTgwMjYtZmM1NDE1ODAzN2ZkIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJkOC1jbG91ZC1pbnN0YW5jZS1tYW5hZ2VyIiwic2VydmljZWFjY291bnQiOnsibmFtZSI6Im5vZGUtZ3JvdXAiLCJ1aWQiOiJkZTFjNWE0Mi0wMjEwLTRmYTAtODA5Yi0yMzJlOGU1MTBmZmMifX0sIm5iZiI6MTc1MTk1MjM1Mywic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OmQ4LWNsb3VkLWluc3RhbmNlLW1hbmFnZXI6bm9kZS1ncm91cCJ9.YVtNuc_wX9IxhE66OTqqKPxBy4hGhBKK34C4U7dCt8ZKnvBos3k8-WsUwhX5QtEHNSemALAr7fn8Y9u3QznqytuFX0GV0iRRU_tcVfht3C-RSGLwKpEVq-_wUNReYBYIF9ycBPmSRRlj_KJevAj9dksUOQS43NIoypnmVX3Y_xsoPmg-QXWriQrlIvH4EDJp6TlcBn8n6fheZwezJjkHqWW1qrU_9a7ZBOaNSDSun9akSW0GeU1ck_pzFI_5UToLMDFz-ycTyQ82m7h5en0B-RisNWatbf8zRxyws6zhGK5voo9R75edKKfXCez0-M1gVlta5EutMVu-IYRiarwn-w"  # Замените на полученный токен
+
+  children:
+    worker:
+      hosts:
+        worker-n1:
+          ansible_host: 192.168.39.58
+          ansible_user: loginov
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        worker-n2:
+          ansible_host: 91.217.196.152
+          ansible_user: haproxy
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+      vars:
+        node_group: worker
+
+    system:
+      hosts:
+        system:
+          ansible_host: 91.217.196.183
+          ansible_user: sunofthetruth
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+      vars:
+        node_group: system

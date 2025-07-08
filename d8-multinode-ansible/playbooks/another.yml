@@ -1,0 +1,4 @@
+kubectl taint nodes k8s-master-n1 node-role=master:NoSchedule
+kubectl taint nodes k8s-system-n1 node-role=system:NoSchedule
+kubectl taint nodes k8s-worker-n1 node-role=worker:NoSchedule
+kubectl taint nodes k8s-worker-n2 node-role=worker:NoSchedule

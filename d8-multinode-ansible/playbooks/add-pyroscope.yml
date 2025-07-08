@@ -1,0 +1,61 @@
+---
+- name: Создать secret и render values для Pyroscope (без community.kubernetes)
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    # Путь к выходному файлу
+    output_values_path: "/Users/invokerkael/Desktop/GitOps/KubernetesOps/ArgoCI-CD/values/pyroscope-values.yaml"
+
+    # Имя секрета и namespace
+    secret_name: pyroscope-s3-creds
+    secret_namespace: default
+
+  tasks:
+    - name: Загрузить Vault переменные
+      ansible.builtin.include_vars:
+        file: "/Users/invokerkael/Desktop/GitOps/KubernetesOps/ansible/d8-multinode-ansible/group_vars/all/s3-secrets.yml"
+
+    - name: Убедиться, что директория существует
+      ansible.builtin.file:
+        path: "/Users/invokerkael/Desktop/GitOps/KubernetesOps/ArgoCI-CD/values"
+        state: directory
+        mode: 0755
+
+    - name: Удалить старый secret, если существует
+      ansible.builtin.shell: |
+        kubectl delete secret {{ secret_name }} -n {{ secret_namespace }} || true
+      args:
+        executable: /bin/bash
+
+    - name: Создать секрет через kubectl
+      ansible.builtin.shell: |
+        echo -n "{{ s3_access_key }}" > /tmp/access_key
+        echo -n "{{ s3_secret_key }}" > /tmp/secret_key
+
+        kubectl create secret generic {{ secret_name }} \
+          --from-file=access_key=/tmp/access_key \
+          --from-file=secret_key=/tmp/secret_key \
+          -n {{ secret_namespace }}
+
+        rm -f /tmp/access_key /tmp/secret_key
+      args:
+        executable: /bin/bash
+
+    - name: Заполнить шаблон pyroscope-values.yml.j2
+      ansible.builtin.template:
+        src: templates/pyroscope-values.yml.j2
+        dest: "/tmp/pyroscope-values.yml"
+
+    - name: Копировать файл values на локальную машину
+      ansible.builtin.copy:
+        src: "/tmp/pyroscope-values.yml"
+        dest: "{{ output_values_path }}"
+        mode: 0644
+
+    - name: Отладочная информация
+      debug:
+        msg: |
+          ✅ Секрет '{{ secret_name }}' создан
+          ✅ Values файл сохранён по пути:
+          {{ output_values_path }}

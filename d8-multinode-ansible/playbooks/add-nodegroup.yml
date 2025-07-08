@@ -1,0 +1,40 @@
+- name: Bootstrap новых нод Deckhouse
+  hosts: worker,system
+  become: true
+  gather_facts: no
+  vars:
+    bootstrap_secret_url: "https://{{ kube_apiserver }}/api/v1/namespaces/d8-cloud-instance-manager/secrets/manual-bootstrap-for-{{ node_group }}"
+    delegeate_to: master
+  tasks:
+    - name: Проверка нода уже бутстрапнута?
+      stat:
+        path: /var/lib/bashible
+      register: bootstrapped
+
+    - name: Получить bootstrap.sh из kube-apiserver
+      uri:
+        url: "{{ bootstrap_secret_url }}"
+        return_content: yes
+        method: GET
+        status_code: 200
+        headers:
+          Authorization: "Bearer {{ token }}"
+        validate_certs: no
+      register: bootstrap_secret
+      when: not bootstrapped.stat.exists
+
+    - name: Запуск bootstrap.sh
+      shell: "{{ bootstrap_secret.json.data['bootstrap.sh'] | b64decode }}"
+      args:
+        executable: /bin/bash
+      when: not bootstrapped.stat.exists
+
+    - name: Ждать подключения после перезагрузки
+      wait_for_connection:
+        delay: 60
+        timeout: 400
+      when: not bootstrapped.stat.exists
+    
+    - name: Уведомление — нода добавлена
+      debug:
+        msg: "✅ Нода {{ inventory_hostname }} успешно добавлена и готова."
