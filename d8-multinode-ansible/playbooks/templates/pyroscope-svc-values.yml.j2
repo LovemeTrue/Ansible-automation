@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pyroscope
+  namespace: d8-monitoring
+  labels:
+    app.kubernetes.io/name: pyroscope
+    argocd.argoproj.io/instance: pyroscope
+spec:
+  type: ExternalName
+  externalName: pyroscope.pyroscope.svc.cluster.local
+  ports:
+    - name: http
+      port: 4040
+      targetPort: 4040

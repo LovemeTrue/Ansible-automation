@@ -1,0 +1,53 @@
+- name: Создать SVC из шаблона и применить его
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    # Путь к выходному файлу
+    output_svc_path: "/tmp/pyroscope-svc.yaml"
+    
+    # Имя сервиса и namespace
+    svc_name: pyroscope-svc
+    svc_namespace: default
+
+  tasks:
+    - name: Убедиться, что файл шаблона существует
+      ansible.builtin.stat:
+        file: "templates/pyroscope-svc-values.yml.j2"
+      register: template_stat
+      delegate_to: localhost
+
+    - name: Пропустить, если шаблон не найден
+      ansible.builtin.fail:
+        msg: "Шаблон 'templates/pyroscope-svc-values.yml.j2' не найден!"
+      when: not template_stat.stat.exists
+
+    - name: Создать YAML файл из шаблона, если он не существует
+      ansible.builtin.template:
+        src: "templates/pyroscope-svc-values.yml.j2"
+        dest: "{{ output_svc_path }}"
+      when: not (ansible.builtin.stat(path=output_svc_path).stat.exists)
+
+    - name: Проверить, существует ли уже SVC
+      ansible.builtin.shell: |
+        kubectl get svc {{ svc_name }} -n {{ svc_namespace }} --ignore-not-found
+      args:
+        executable: /bin/bash
+      register: svc_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Применить YAML файл через kubectl apply
+      ansible.builtin.shell: |
+        kubectl apply -f {{ output_svc_path }}
+      args:
+        executable: /bin/bash
+      when: "'service/{{ svc_name }}' not found" in svc_check.stdout or "'No resources found' in svc_check.stdout"
+      register: apply_result
+      changed_when: "'unchanged' not in apply_result.stdout"
+
+    - name: Отладочная информация
+      debug:
+        msg: |
+          ✅ SVC успешно обработан.
+          Результат применения: {{ apply_result.stdout }}
