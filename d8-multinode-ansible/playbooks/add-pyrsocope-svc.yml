@@ -46,6 +46,15 @@
       register: apply_result
       changed_when: "'unchanged' not in apply_result.stdout"
 
+    - name: Выполнить аннотации ns для профилирования
+      ansible.builtin.shell: |
+        kubectl annotate namespace elma365 pyroscope.io/scrape=true
+        kubectl annotate namespace elma365-dbs pyroscope.io/scrape=true  
+      args:
+        executable: /bin/bash
+      when: "'pyroscope.io/enabled' not in (kubectl get namespace {{ svc_namespace }} -o json | jq -r '.metadata.annotations | keys[]')"
+      register: annotate_result
+      changed_when: "'annotation updated' in annotate_result.stdout"
     - name: Отладочная информация
       debug:
         msg: |
