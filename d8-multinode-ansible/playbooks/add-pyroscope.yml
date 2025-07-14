@@ -43,6 +43,11 @@
         kubectl create ns pyroscope || true
         kubectl annotate ns elma365 profiles.grafana.com/scrape=true --overwrite
         kubectl annotate ns elma365-dbs profiles.grafana.com/scrape=true --overwrite
+
+
+        kubectl patch namespace elma365 --type merge -p '{"metadata":{"annotations":{"profiles.grafana.com/cpu.scrape":"true","profiles.grafana.com/cpu.port":"8080","profiles.grafana.com/cpu.path":"/debug/pprof/profile","profiles.grafana.com/memory.scrape":"true","profiles.grafana.com/memory.port":"8080","profiles.grafana.com/memory.path":"/debug/pprof/heap","profiles.grafana.com/goroutine.scrape":"true","profiles.grafana.com/goroutine.port":"8080","profiles.grafana.com/goroutine.path":"/debug/pprof/goroutine"}}}'
+
+        kubectl patch namespace elma365-dbs --type merge -p '{"metadata":{"annotations":{"profiles.grafana.com/cpu.scrape":"true","profiles.grafana.com/cpu.port":"8080","profiles.grafana.com/cpu.path":"/debug/pprof/profile","profiles.grafana.com/memory.scrape":"true","profiles.grafana.com/memory.port":"8080","profiles.grafana.com/memory.path":"/debug/pprof/heap","profiles.grafana.com/goroutine.scrape":"true","profiles.grafana.com/goroutine.port":"8080","profiles.grafana.com/goroutine.path":"/debug/pprof/goroutine"}}}'
       args:
         executable: /bin/bash
 
