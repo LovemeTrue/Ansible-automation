@@ -41,6 +41,8 @@
         rm -f /tmp/access_key /tmp/secret_key
         
         kubectl create ns pyroscope || true
+        kubectl annotate ns elma365 profiles.grafana.com/scrape=true --overwrite
+        kubectl annotate ns elma365-dbs profiles.grafana.com/scrape=true --overwrite
       args:
         executable: /bin/bash
 
