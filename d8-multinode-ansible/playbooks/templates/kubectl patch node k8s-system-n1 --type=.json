@@ -1,0 +1,16 @@
+kubectl patch node k8s-system-n1 --type='merge' -p '{
+  "metadata": {
+    "labels": {
+      "node-role.deckhouse.io/system": ""
+    }
+  },
+  "spec": {
+    "taints": [
+      {
+        "effect": "NoSchedule",
+        "key": "node-role",
+        "value": "system"
+      }
+    ]
+  }
+}'

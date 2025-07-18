@@ -1,0 +1,41 @@
+---
+- name: Проверка и установка зависимостей на system-node
+  hosts: argo
+  become: true
+  vars:
+    python_bin: "python3"
+    pip_bin: "pip3"
+
+  tasks:
+    - name: Проверка установлена ли библиотека kubernetes через pip3
+      ansible.builtin.shell: |
+        {{ pip_bin }} show kubernetes > /dev/null 2>&1 && echo "installed" || echo "not_installed"
+      register: kubernetes_installed
+      changed_when: false
+
+    - name: Установка библиотеки kubernetes, если не установлена
+      when: "'not_installed' in kubernetes_installed.stdout"
+      ansible.builtin.shell: |
+        {{ pip_bin }} install kubernetes
+
+    - name: Проверка наличия коллекции community.kubernetes в Ansible
+      ansible.builtin.shell: |
+        ansible-galaxy collection list community.kubernetes | grep -q "community.kubernetes" && echo "installed" || echo "not_installed"
+      register: galaxy_collection_installed
+      changed_when: false
+
+    - name: Установка коллекции community.kubernetes, если не установлена
+      when: "'not_installed' in galaxy_collection_installed.stdout"
+      ansible.builtin.shell: |
+        ansible-galaxy collection install community.kubernetes
+
+    - name: Проверка установлен ли Helm
+      ansible.builtin.shell: |
+        helm version --short > /dev/null 2>&1 && echo "installed" || echo "not_installed"
+      register: helm_installed
+      changed_when: false
+
+    - name: Установка Helm с помощью get-helm-3 скрипта, если не установлен
+      when: "'not_installed' in helm_installed.stdout"
+      ansible.builtin.shell: |
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash

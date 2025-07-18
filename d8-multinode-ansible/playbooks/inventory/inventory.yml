@@ -29,7 +29,10 @@ all:
       hosts:
         localhost:
           ansible_connection: local
-
+  children:
+    argo:
+      hosts:
+        system:
   # All vars included localhost
   vars:
     pod_subnet_cidr: "10.111.0.0/16"
