@@ -89,7 +89,6 @@
           --ssh-host={{ master_ip }} \
           --ssh-agent-private-keys=/root/.ssh/id_rsa \
       environment:
-        DECKHOUSE_SUDO_PASSWORD: "{{ ansible_become_password }}"
         SSH_AUTH_SOCK: "{{ lookup('env', 'SSH_AUTH_SOCK') }}"
       args:
         executable: /bin/bash

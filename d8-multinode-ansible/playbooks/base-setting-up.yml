@@ -76,7 +76,7 @@
           | grep -q .; do
           echo "Ожидаем запуск ingress-controller..." && sleep 10
         done
-      retries: 30
+      retries: 5
       delay: 10
       register: ingress_status
       until: ingress_status.rc == 0
