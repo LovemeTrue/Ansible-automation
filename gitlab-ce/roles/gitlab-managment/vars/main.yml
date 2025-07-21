@@ -1,0 +1,18 @@
+---
+# GitLab connection parameters
+gitlab_url: "https://localhost:8088"
+gitlab_admin_user: "root"
+gitlab_admin_user_id: 1  # ID пользователя root обычно 1
+gitlab_validate_certs: false  # Для self-signed certs
+
+# Token parameters
+token_name: "ansible-automation-token"
+token_scopes:
+  - "api"
+  - "write_repository"
+token_expiry_date: "{{ lookup('pipe', 'date -d "+6 months" +%Y-%m-%d') }}"
+
+# Project defaults
+project_name: "default-project"
+project_visibility: "public"
+default_branch: "main"

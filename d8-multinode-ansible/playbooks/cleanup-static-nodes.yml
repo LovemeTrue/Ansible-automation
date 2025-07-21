@@ -1,0 +1,19 @@
+---
+- name: Выполнить cleanup_static_node.sh на worker и system нодах
+  hosts: worker-n1,worker-n2,system
+  become: true
+  gather_facts: no
+
+  vars:
+    script_path: "/tmp/cleanup_static_node.sh"
+    flag: "--yes-i-am-sane-and-i-understand-what-i-am-doing"
+
+  tasks:
+    - name: Скопировать скрипт cleanup_static_node.sh на удаленный хост
+      copy:
+        src: "cleanup_static_node.sh"
+        dest: "{{ script_path }}"
+        mode: 0755
+
+    - name: Запустить скрипт с флагом
+      command: "{{ script_path }} {{ flag }}"
