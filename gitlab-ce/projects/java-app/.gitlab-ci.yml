@@ -1,0 +1,29 @@
+stages:
+  - build
+  - deploy
+  - test
+variables:
+  IMAGE_NAME: "localhost:5001/java-app"
+
+build:
+  stage: build
+  image: docker:latest
+  script:
+    - docker build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  script:
+    - docker stop java-app || true
+    - docker rm java-app || true
+    - docker run -d --name java-app -p 8080:8080 $IMAGE_NAME
+ 
+
+test:
+  stage: test
+  image: curlimages/curl:latest  # Специальный образ с curl
+  script:
+    - sleep 3
+    - curl --fail http://localhost:8080 || (echo "Java app not responding" && exit 1)
