@@ -1,9 +1,0 @@
----
-# Основной файл задач, включает другие таски по порядку
-- name: Include token creation task
-  ansible.builtin.include_tasks: create-token.yml
-  tags: token
-
-- name: Include project creation task
-  ansible.builtin.include_tasks: create_project.yml
-  tags: project
