@@ -1,5 +1,5 @@
 ---
-- name: Проверка и установка зависимостей на system-node
+- name: Проверка и установка зависимостей на node
   hosts: argo
   become: true
   vars:

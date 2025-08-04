@@ -40,7 +40,7 @@ all:
     cluster_domain: "cluster.local"
     public_domain_template: "%s.d8-multinode.sale.elewise.com"
     internal_network_cidrs:
-      - "91.217.196.0/24"
+      - "91.217.0.0/16"
       - "192.168.39.0/24"
     release_channel: "Stable"
     ssh_user: "vrstel"
